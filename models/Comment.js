@@ -8,25 +8,26 @@ const CommentSchema = new mongoose.Schema({
     },
     pictureSharedLink:{
         type:String,
-        required:true
-    },
-    thumbUp:{
-        type:String,
-        required:true
+        default:"none"
     },
     patreonUrl:{
         type:String,
-        required:true
+        default:"none"
     },
     paypalEmail:{
         type:String,
-        required:true
+        default:"none"
     },
-    senderName:{
+    commentatorName:{
         type:String,
-        required:true
+        default:"anonymous"
+    },
+    popularity:{
+        type:Number,
+        default:0
     },
     postId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Post' },
+    postUserId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
     _userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' }
 });
 

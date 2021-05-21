@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 dotenv.config({path:'./config.env'});
 const server = restify.createServer();
 
+//curl ifconfig.me ipconfig getifaddr en0
 //Middleware
 server.use(restify.plugins.acceptParser(server.acceptable));
 server.use(restify.plugins.queryParser());

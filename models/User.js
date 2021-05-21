@@ -17,6 +17,14 @@ const UserSchema = new mongoose.Schema({
     didLeave:{
         type:Boolean,
         default:false
+    },
+    profile:{
+        type:String,
+        default:"none"
+    },
+    popularity:{
+        type:String,
+        default:"0"
     }
 });
 const User = mongoose.model('User',UserSchema);

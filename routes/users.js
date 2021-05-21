@@ -74,6 +74,7 @@ module.exports = server =>{
 
     server.post('/login', async (req,res,next)=>{
         const {email,password} = req.body;
+        let userId = '';
         try {
             //If it is not unique here, that means the design has error.
             let result = await User.findOne({email:email});
@@ -83,6 +84,9 @@ module.exports = server =>{
                     return res.send(400);
                 }
             }
+
+            userId = result._id;
+
  
                 const user = await auth.authenticate(email,password);
             // const token = jwt.sign(user.toJSON(), process.env.JWT_SECRET,{
@@ -90,13 +94,12 @@ module.exports = server =>{
             // });
                 const token = jwt.sign(user.toJSON(), process.env.JWT_SECRET,{});
                 const {iat, exp} = jwt.decode(token);
-                res.send({iat,exp,token});
+                res.send({iat,exp,token,userId});
                 next();
         } catch (err) {
             return next(new errors.UnauthorizedError(err));
         }
     }); 
-
     server.get('/verify', async (req,res,next)=>{
         try {
         let reqRandomString = await req.query.id;
@@ -119,16 +122,53 @@ module.exports = server =>{
         } catch (err) {
             return next(new errors.UnauthorizedError(err));
         }
-    }); 
-
-    //TODO leave the service, shutdown account
-     //Delete
-     server.del('/users/:id',async(req,res,next)=>{
+    });
+    
+    //all users
+    server.get('/users', async (req,res,next) => {
+        try{
+            const users =  await User.find({});
+            res.send(users);
+            next();
+        }catch(err){
+            return next(new errors.InvalidContentError(err));
+        }
+    });
+    //single cutomer, show
+    server.get('/users/:id', async (req,res,next) => {
+        try{
+            const user =  await User.findById(req.params.id);
+            res.send(user);
+            next();
+        }catch(err){
+            return next(
+                new errors.ResourceNotFoundError(
+                    `There is no post with the id of ${req.params.id}`));
+        }
+    });
+    //Delete
+    server.del('/users/:id',async(req,res,next)=>{
         try{
             const user= await User.findOneAndRemove({_id:req.params.id});
             res.send(204);
             next();
         }catch(err){
+            return next(
+                new errors.ResourceNotFoundError(
+                    `There is no post with the id of ${req.params.id}`));
+        }
+    });
+    //update profile
+    server.put('/users/:id',async(req,res,next)=>{
+        // console.log("req",req.body);
+        try {
+            const user= await User.findOneAndUpdate(
+            { _id: req.params.id },
+            req.body
+            );
+            res.send(200);
+            next();
+        } catch (error) {
             return next(
                 new errors.ResourceNotFoundError(
                     `There is no post with the id of ${req.params.id}`));

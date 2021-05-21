@@ -13,8 +13,9 @@ module.exports = server =>{
             thumbUp,
             patreonUrl,
             paypalEmail,
-            senderName,
+            commentatorName,
             postId,
+            postUserId,
             _userId
         } = req.body;
         const comment= new Comment({
@@ -23,8 +24,9 @@ module.exports = server =>{
             thumbUp,
             patreonUrl,
             paypalEmail,
-            senderName,
+            commentatorName,
             postId,
+            postUserId,
             _userId
         });
         try {
@@ -32,7 +34,26 @@ module.exports = server =>{
             res.send(201);
             next();
         } catch (error) {
-            return next(new errors.InternalError(err.message));
+            return next(new errors.InternalError(error.message));
+        }
+    });
+    //search
+    server.get('/comments/searches', async (req,res,next) => {
+        // resourcename?id=123  
+        try{
+            let postIdStr = await req.query.id;
+            let userIdStr = await req.query.userId;
+            if (typeof postIdStr === 'string') {
+                const comments =  await Comment.find({postId:postIdStr});
+                res.send(comments);
+            }
+            if (typeof userIdStr === 'string') {
+                const comments =  await Comment.find({_userId:userIdStr});
+                res.send(comments);
+            }
+            next();
+        }catch(err){
+            return next(new errors.InvalidContentError(err));
         }
     });
     //list
@@ -83,6 +104,30 @@ module.exports = server =>{
             return next(
                 new errors.ResourceNotFoundError(
                     `There is no comment with the id of ${req.params.id}`));
+        }
+    });
+    //Delete comments by postid
+    server.del('/comments/postid/:postid',async(req,res,next)=>{
+        try{
+            const comment= await Comment.deleteMany({postId:req.params.postid});
+            res.send(204);
+            next();
+        }catch(err){
+            return next(
+                new errors.ResourceNotFoundError(
+                    `There is no comment with the postid of ${req.params.postid}`));
+        }
+    });
+    //Delete comments by postuserid not commentator user id. this is used in quiting logic
+    server.del('/comments/postuserid/:id',async(req,res,next)=>{
+        try{
+            const comment= await Comment.deleteMany({postUserId:req.params.id});
+            res.send(204);
+            next();
+        }catch(err){
+            return next(
+                new errors.ResourceNotFoundError(
+                    `There is no comment with the postid of ${req.params.postuserid}`));
         }
     });
 };
