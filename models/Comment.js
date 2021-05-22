@@ -26,6 +26,10 @@ const CommentSchema = new mongoose.Schema({
         type:Number,
         default:0
     },
+    hasReply:{
+        type:Boolean,
+        default:false
+    },
     postId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Post' },
     postUserId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
     _userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' }

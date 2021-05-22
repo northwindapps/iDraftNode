@@ -16,6 +16,7 @@ module.exports = server =>{
             commentatorName,
             postId,
             postUserId,
+            hasReply,
             _userId
         } = req.body;
         const comment= new Comment({
@@ -27,6 +28,7 @@ module.exports = server =>{
             commentatorName,
             postId,
             postUserId,
+            hasReply,
             _userId
         });
         try {
