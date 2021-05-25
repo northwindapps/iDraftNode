@@ -1,5 +1,6 @@
 const errors = require('restify-errors');
 const Comment = require('../models/Comment');
+const User = require('../models/User');
 
 module.exports = server =>{
     //Add 
@@ -32,6 +33,13 @@ module.exports = server =>{
             _userId
         });
         try {
+            let guard = await User.findOne({_id:_userId});
+            if (!guard){
+                return res.send(400);
+            }
+            if (guard.didLeave == true){
+                return res.send(400);
+            }
             const newComment = await comment.save();
             res.send(201);
             next();

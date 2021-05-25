@@ -39,6 +39,9 @@ module.exports = server =>{
             if (!guard){
                 return res.send(400);
             }
+            if (guard.didLeave == true){
+                return res.send(400);
+            }
             const newPost = await post.save();
             res.send(201);
             next();
